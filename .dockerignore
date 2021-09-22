@@ -1,3 +1,2 @@
-*
-!.docker.json
-!filebrowser
+.git
+.github
