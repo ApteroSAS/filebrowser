@@ -209,6 +209,7 @@ func rawFileHandler(w http.ResponseWriter, r *http.Request, file *files.FileInfo
 	setContentDisposition(w, r, file)
 
 	w.Header().Set("Cache-Control", "private")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	http.ServeContent(w, r, file.Name, file.ModTime, fd)
 	return 0, nil
 }

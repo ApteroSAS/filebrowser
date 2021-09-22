@@ -24,6 +24,16 @@
             </td>
             <td class="small">
               <button
+                      class="action copy-clipboard"
+                      :data-clipboard-text="buildDirectLink(link.hash)"
+                      :aria-label="$t('buttons.copyToClipboard')"
+                      :title="$t('buttons.copyToClipboard')"
+              >
+                <i class="material-icons">content_copy</i>
+              </button>
+            </td>
+            <td class="small">
+              <button
                 class="action copy-clipboard"
                 :data-clipboard-text="buildLink(link.hash)"
                 :aria-label="$t('buttons.copyToClipboard')"
@@ -156,6 +166,14 @@ export default {
       this.links = links;
       this.sort();
 
+      //create default link
+      if (this.links.length == 0) {
+        await api.create(this.url, "");
+        const links = await api.get(this.url);
+        this.links = links;
+        this.sort();
+      }
+
       if (this.links.length == 0) {
         this.listing = false;
       }
@@ -215,6 +233,9 @@ export default {
     },
     buildLink(hash) {
       return `${window.location.origin}${baseURL}/share/${hash}`;
+    },
+    buildDirectLink(hash) {
+      return `${window.location.origin}${baseURL}/api/public/dl/${hash}?inline=true`;
     },
     sort() {
       this.links = this.links.sort((a, b) => {

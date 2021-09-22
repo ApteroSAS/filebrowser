@@ -35,10 +35,15 @@ RUN go build
 ################
 # create final image
 ################
-FROM alpine:latest
-RUN apk --update add ca-certificates \
-                     mailcap \
-                     curl
+#FROM alpine:latest
+#RUN apk update && apk add bash
+#RUN apk --update add ca-certificates \
+#                     mailcap \
+#                     curl
+
+FROM ubuntu:20.04
+RUN apt update
+RUN apt update && apt install -y ca-certificates curl mime-support bash
 
 HEALTHCHECK --start-period=2s --interval=5s --timeout=3s \
   CMD curl -f http://localhost/health || exit 1
