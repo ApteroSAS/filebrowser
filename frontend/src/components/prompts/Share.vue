@@ -35,11 +35,21 @@
             <td class="small">
               <button
                 class="action copy-clipboard"
-                :data-clipboard-text="buildLink(link.hash)"
+                :data-clipboard-text="buildLink(link)"
                 :aria-label="$t('buttons.copyToClipboard')"
                 :title="$t('buttons.copyToClipboard')"
               >
                 <i class="material-icons">content_paste</i>
+              </button>
+            </td>
+            <td class="small" v-if="hasDownloadLink()">
+              <button
+                class="action copy-clipboard"
+                :data-clipboard-text="buildDownloadLink(link)"
+                :aria-label="$t('buttons.copyDownloadLinkToClipboard')"
+                :title="$t('buttons.copyDownloadLinkToClipboard')"
+              >
+                <i class="material-icons">content_paste_go</i>
               </button>
             </td>
             <td class="small">
@@ -127,8 +137,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
-import { share as api } from "@/api";
-import { baseURL } from "@/utils/constants";
+import { share as api, pub as pub_api } from "@/api";
 import moment from "moment";
 import Clipboard from "clipboard";
 
@@ -231,8 +240,16 @@ export default {
     humanTime(time) {
       return moment(time * 1000).fromNow();
     },
-    buildLink(hash) {
-      return `${window.location.origin}${baseURL}/share/${hash}`;
+    buildLink(share) {
+      return api.getShareURL(share);
+    },
+    hasDownloadLink() {
+      return (
+        this.selected.length === 1 && !this.req.items[this.selected[0]].isDir
+      );
+    },
+    buildDownloadLink(share) {
+      return pub_api.getDownloadURL(share);
     },
     buildDirectLink(hash) {
       return `${window.location.origin}${baseURL}/api/public/dl/${hash}?inline=true`;

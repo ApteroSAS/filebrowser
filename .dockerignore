@@ -1,4 +1,4 @@
 .git
-.github
+!.docker.json
 Dockerfile
 *.bat

@@ -81,6 +81,8 @@
     "help": "Yardım"
   },
   "languages": {
+    "he": "עברית",
+    "hu": "Magyar",
     "ar": "العربية",
     "de": "Deutsch",
     "en": "English",
@@ -99,6 +101,7 @@
     "sk": "Slovenčina",
     "svSE": "Swedish (Sweden)",
     "tr" : "Türkçe",
+    "ua": "Українська",
     "zhCN": "中文 (简体)",
     "zhTW": "中文 (繁體)"
   },
@@ -181,6 +184,7 @@
     "customStylesheet": "Özel CSS",
     "defaultUserDescription": "Bu, yeni kullanıcılar için varsayılan ayarlardır.",
     "disableExternalLinks": "Harici bağlantıları devre dışı bırakın (dökümantasyon hariç)",
+    "disableUsedDiskPercentage": "Disable used disk percentage graph",
     "documentation": "dökümantasyon",
     "examples": "Örnekler",
     "executeOnShell": "Komut satırında çalıştır",

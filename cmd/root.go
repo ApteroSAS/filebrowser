@@ -3,8 +3,8 @@ package cmd
 import (
 	"crypto/tls"
 	"errors"
+	"io"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -181,6 +181,7 @@ user created with the credentials from options "username" and "password".`,
 		defer listener.Close()
 
 		log.Println("Listening on", listener.Addr().String())
+		//nolint: gosec
 		if err := http.Serve(listener, handler); err != nil {
 			log.Fatal(err)
 		}
@@ -299,7 +300,7 @@ func setupLog(logMethod string) {
 	case "stderr":
 		log.SetOutput(os.Stderr)
 	case "":
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	default:
 		log.SetOutput(&lumberjack.Logger{
 			Filename:   logMethod,
@@ -312,9 +313,10 @@ func setupLog(logMethod string) {
 
 func quickSetup(flags *pflag.FlagSet, d pythonData) {
 	set := &settings.Settings{
-		Key:           generateKey(),
-		Signup:        false,
-		CreateUserDir: false,
+		Key:              generateKey(),
+		Signup:           false,
+		CreateUserDir:    false,
+		UserHomeBasePath: settings.DefaultUsersHomeBasePath,
 		Defaults: settings.UserDefaults{
 			Scope:       ".",
 			Locale:      "en",
@@ -330,6 +332,11 @@ func quickSetup(flags *pflag.FlagSet, d pythonData) {
 				Download: true,
 			},
 		},
+		AuthMethod: "",
+		Branding:   settings.Branding{},
+		Commands:   nil,
+		Shell:      nil,
+		Rules:      nil,
 	}
 
 	var err error

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mholt/archiver"
+	"github.com/mholt/archiver/v3"
 
 	"github.com/filebrowser/filebrowser/v2/files"
 	"github.com/filebrowser/filebrowser/v2/fileutils"
@@ -44,7 +44,7 @@ func parseQueryFiles(r *http.Request, f *files.FileInfo, _ *users.User) ([]strin
 	return fileSlice, nil
 }
 
-//nolint: goconst
+// nolint: goconst,nolintlint
 func parseQueryAlgorithm(r *http.Request) (string, archiver.Writer, error) {
 	// TODO: use enum
 	switch r.URL.Query().Get("algo") {

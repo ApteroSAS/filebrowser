@@ -103,7 +103,7 @@
             </a>
             <a
               target="_blank"
-              :href="downloadUrl + '&inline=true'"
+              :href="raw"
               class="button button--flat"
               v-if="!req.isDir"
             >
@@ -137,16 +137,17 @@
     >
       <i class="material-icons">chevron_right</i>
     </button>
+    <link rel="prefetch" :href="previousRaw" />
+    <link rel="prefetch" :href="nextRaw" />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import { files as api } from "@/api";
-import { baseURL, resizePreview } from "@/utils/constants";
+import { resizePreview } from "@/utils/constants";
 import url from "@/utils/url";
 import throttle from "lodash.throttle";
-
 import HeaderBar from "@/components/header/HeaderBar";
 import Action from "@/components/header/Action";
 import ExtendedImage from "@/components/files/ExtendedImage";
@@ -166,12 +167,13 @@ export default {
       nextLink: "",
       listing: null,
       name: "",
-      subtitles: [],
       fullSize: false,
       showNav: true,
       navTimeout: null,
       hoverNav: false,
       autoPlay: false,
+      previousRaw: "",
+      nextRaw: "",
     };
   },
   computed: {
@@ -183,29 +185,26 @@ export default {
       return this.nextLink !== "";
     },
     downloadUrl() {
-      return `${baseURL}/api/raw${url.encodePath(this.req.path)}?auth=${
-        this.jwt
-      }`;
-    },
-    previewUrl() {
-      // reload the image when the file is replaced
-      const key = Date.parse(this.req.modified);
-
-      if (this.req.type === "image" && !this.fullSize) {
-        return `${baseURL}/api/preview/big${url.encodePath(
-          this.req.path
-        )}?k=${key}`;
-      }
-      return `${baseURL}/api/raw${url.encodePath(this.req.path)}?k=${key}`;
+      return api.getDownloadURL(this.req);
     },
     raw() {
-      return `${this.previewUrl}&inline=true`;
+      if (this.req.type === "image" && !this.fullSize) {
+        return api.getPreviewURL(this.req, "big");
+      }
+
+      return api.getDownloadURL(this.req, true);
     },
     showMore() {
       return this.$store.state.show === "more";
     },
     isResizeEnabled() {
       return resizePreview;
+    },
+    subtitles() {
+      if (this.req.subtitles) {
+        return api.getSubtitlesURL(this.req);
+      }
+      return [];
     },
   },
   watch: {
@@ -241,11 +240,11 @@ export default {
     },
     prev() {
       this.hoverNav = false;
-      this.$router.push({ path: this.previousLink });
+      this.$router.replace({ path: this.previousLink });
     },
     next() {
       this.hoverNav = false;
-      this.$router.push({ path: this.nextLink });
+      this.$router.replace({ path: this.nextLink });
     },
     key(event) {
       if (this.show !== null) {
@@ -272,12 +271,6 @@ export default {
         this.autoPlay = false;
       }
 
-      if (this.req.subtitles) {
-        this.subtitles = this.req.subtitles.map(
-          (sub) => `${baseURL}/api/raw${sub}?inline=true`
-        );
-      }
-
       let dirs = this.$route.fullPath.split("/");
       this.name = decodeURIComponent(dirs[dirs.length - 1]);
 
@@ -302,19 +295,29 @@ export default {
         for (let j = i - 1; j >= 0; j--) {
           if (mediaTypes.includes(this.listing[j].type)) {
             this.previousLink = this.listing[j].url;
+            this.previousRaw = this.prefetchUrl(this.listing[j]);
             break;
           }
         }
-
         for (let j = i + 1; j < this.listing.length; j++) {
           if (mediaTypes.includes(this.listing[j].type)) {
             this.nextLink = this.listing[j].url;
+            this.nextRaw = this.prefetchUrl(this.listing[j]);
             break;
           }
         }
 
         return;
       }
+    },
+    prefetchUrl(item) {
+      if (item.type !== "image") {
+        return "";
+      }
+
+      return this.fullSize
+        ? api.getDownloadURL(item, true)
+        : api.getPreviewURL(item, "big");
     },
     openMore() {
       this.$store.commit("showHover", "more");
@@ -344,7 +347,7 @@ export default {
       this.$router.push({ path: uri });
     },
     download() {
-      api.download(null, this.$route.path);
+      window.open(this.downloadUrl);
     },
   },
 };
