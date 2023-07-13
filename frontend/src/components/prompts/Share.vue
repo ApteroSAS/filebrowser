@@ -24,10 +24,10 @@
             </td>
             <td class="small">
               <button
-                      class="action copy-clipboard"
-                      :data-clipboard-text="buildDirectLink(link.hash)"
-                      :aria-label="$t('buttons.copyToClipboard')"
-                      :title="$t('buttons.copyToClipboard')"
+                class="action copy-clipboard"
+                :data-clipboard-text="buildDirectLink(link.hash)"
+                :aria-label="$t('buttons.copyToClipboard')"
+                :title="$t('buttons.copyToClipboard')"
               >
                 <i class="material-icons">content_copy</i>
               </button>
@@ -138,6 +138,7 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 import { share as api, pub as pub_api } from "@/api";
+import { baseURL } from "@/utils/constants";
 import moment from "moment";
 import Clipboard from "clipboard";
 
